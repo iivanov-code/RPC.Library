@@ -101,7 +101,7 @@ namespace NetworkCommunicator.Host
             TClient client = OnNewClientAdded(socket);
             if (this.clientStartListening)
             {
-                client.ListenEvent();
+                client.Listen();
             }
 
             clients.Add(client);

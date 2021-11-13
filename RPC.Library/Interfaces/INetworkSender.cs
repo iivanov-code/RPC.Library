@@ -6,8 +6,6 @@ namespace NetworkCommunicator.Interfaces
 {
     public interface INetworkSender
     {
-        int Send(byte[] messageBuffer, BaseWaitContext context);
-        Task<int> SendAsync(byte[] messageBuffer, BaseWaitContext context);
-        IAsyncResult SendAsyncEvent(byte[] messageBuffer, BaseWaitContext context);
+        Task<int> Send(byte[] messageBuffer, BaseWaitContext context);
     }
 }

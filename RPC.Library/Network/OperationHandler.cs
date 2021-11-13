@@ -33,7 +33,7 @@ namespace NetworkCommunicator.Network
             {
                 BaseWaitContext context = WaitContext.WaitForResponse;
                 _ = responseMessages.TryAdd(context.Guid, null);
-                int sent = await client.SendAsync(buffer, context);
+                int sent = await client.Send(buffer, context);
                 bool result = context.WaitHandle.WaitOne();
 
                 return Deserialize(targetMethod.ReturnType, responseMessages[context.Guid].Data);
@@ -41,7 +41,7 @@ namespace NetworkCommunicator.Network
             else
             {
                 BaseWaitContext context = WaitContext.NoResponse;
-                int sent = await client.SendAsync(buffer, context);
+                int sent = await client.Send(buffer, context);
                 return null;
             }
         }

@@ -18,8 +18,9 @@ namespace RPC.Test
             else
             {
                 var networkClient = new ServiceNetworkClient<Service, IService>("127.0.0.1", 899, new Service());
-                networkClient.ConnectAsync().GetAwaiter().GetResult();
-                networkClient.ListenEvent();
+
+                bool result = networkClient.Connect().GetAwaiter().GetResult();
+                networkClient.Listen();
 
                 Stopwatch stopwatch = new Stopwatch();
                 List<long> times = new List<long>();

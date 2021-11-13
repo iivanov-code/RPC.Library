@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Threading;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace NetworkCommunicator.Interfaces
 {
     public interface INetworkClient : INetworkSender, IDisposable
     {
-        ValueTask ConnectAsync(CancellationToken? token = null);
-        Task Listen(CancellationToken? token = null);
-        Task ListenAsync(CancellationToken? token = null);
-        void ListenEvent();
+        Task<bool> AcceptConnection(ushort port);
+        Task<bool> Connect();
+        Task Listen();
     }
 }
