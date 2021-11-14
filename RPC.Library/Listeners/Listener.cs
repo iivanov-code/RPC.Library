@@ -60,7 +60,16 @@ namespace RPC.Library.Listeners
                 while (!Token.IsCancellationRequested)
                 {
                     byte[] buffer = new byte[bufferSize];
-                    int read = socket.Receive(buffer, SocketFlags.None);
+                    int read = 0;
+                    try
+                    {
+                        read = socket.Receive(buffer, SocketFlags.None);
+                    }
+                    catch (SocketException ex)
+                    {
+                        return;
+                    }
+
                     int packetSize = BitConverter.ToInt32(buffer);
 
                     var key = new Guid(new Span<byte>(buffer, sizeof(int), GUID_SIZE));

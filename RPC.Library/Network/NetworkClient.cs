@@ -25,7 +25,7 @@ namespace NetworkCommunicator.Network
 
         }
 
-        public NetworkClient(Socket socket, int bufferSize = 4096, ListenerTypes type = ListenerTypes.Async)
+        public NetworkClient(Socket socket, int bufferSize = 4096, ListenerTypes type = ListenerTypes.Event)
         {
             this.socket = socket;
 
