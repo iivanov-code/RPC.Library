@@ -17,18 +17,30 @@ namespace NetworkCommunicator.Network
         private IPAddress remoteHostIp;
         private ushort remotePort;
 
-        public NetworkClient(Socket socket, int bufferSize = 4096)
-        {
-            this.socket = socket;
-            this.listener = new Listener(ref this.socket, bufferSize);
-        }
-
         public NetworkClient(string remoteHostIP, ushort remotePort, int bufferSize = 4096)
+            : this(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), bufferSize)
         {
             this.RemoteHostIP = IPAddress.Parse(remoteHostIP);
             this.RemotePort = remotePort;
-            this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-            this.listener = new Listener(ref socket, bufferSize);
+
+        }
+
+        public NetworkClient(Socket socket, int bufferSize = 4096, ListenerTypes type = ListenerTypes.Async)
+        {
+            this.socket = socket;
+
+            switch (type)
+            {
+                case ListenerTypes.Basic:
+                    this.listener = new Listener(ref socket, bufferSize);
+                    break;
+                case ListenerTypes.Async:
+                    this.listener = new AsyncListener(ref socket, bufferSize);
+                    break;
+                case ListenerTypes.Event:
+                    this.listener = new EventListener(ref socket, bufferSize);
+                    break;
+            }
         }
 
         internal event EventHandler<MessageEventArgs> MessageReceived
@@ -43,7 +55,7 @@ namespace NetworkCommunicator.Network
             }
         }
 
-        protected internal IPAddress RemoteHostIP
+        public IPAddress RemoteHostIP
         {
             get
             {
@@ -54,13 +66,13 @@ namespace NetworkCommunicator.Network
 
                 return remoteHostIp;
             }
-            set
+            protected internal set
             {
                 remoteHostIp = value;
             }
         }
 
-        protected internal ushort RemotePort
+        public ushort RemotePort
         {
             get
             {
@@ -71,7 +83,7 @@ namespace NetworkCommunicator.Network
 
                 return remotePort;
             }
-            set
+            protected internal set
             {
                 remotePort = value;
             }

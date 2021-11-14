@@ -79,6 +79,9 @@ namespace RPC.Library.Listeners
 
                 int read = socket.EndReceive(result, out SocketError errorCode);
                 int packetSize = BitConverter.ToInt32(buffer);
+
+                if (packetSize == 0) return;
+
                 Guid key = new Guid(new ReadOnlySpan<byte>(buffer, sizeof(int), GUID_SIZE));
 
                 BaseWaitContext context;

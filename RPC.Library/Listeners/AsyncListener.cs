@@ -31,32 +31,40 @@ namespace RPC.Library.Listeners
                 });
         }
 
-        public override Task Listen()
+        public override async Task Listen()
         {
-            return Task.Factory.StartNew(async () =>
+            while (!Token.IsCancellationRequested)
             {
                 using IMemoryOwner<byte> memoryOwner = bufferPool.Rent();
                 int read = await socket.ReceiveAsync(memoryOwner.Memory, SocketFlags.None, Token);
-                int messageSize = BitConverter.ToInt32(memoryOwner.Memory.Span);
+                int packetSize = BitConverter.ToInt32(memoryOwner.Memory.Span);
 
                 var key = new Guid(memoryOwner.Memory.Span.Slice(sizeof(int), GUID_SIZE));
 
                 BaseWaitContext context;
 
-                if (!ResponseMessagesDictionary.ContainsKey(key))
+                if (this.ResponseMessagesDictionary.ContainsKey(key))
                 {
-                    context = WaitContext.WaitForResponse;
-                    _ = ResponseMessagesDictionary.TryAdd(key, context);
+                    context = this.ResponseMessagesDictionary[key];
                     context.FireEvent = true;
+                    context.ShouldWait = true;
                 }
                 else
                 {
-                    context = ResponseMessagesDictionary[key];
+                    context = this.ResponseMessagesDictionary.GetOrAdd(key, (k, shouldWait) => new WaitContext(k, shouldWait), false);
+                    context.FireEvent = true;
+                    context.ShouldWait = false;
                 }
 
-                context.ResponseMessage.Write(memoryOwner.Memory.Span.Slice(sizeof(int) + GUID_SIZE, read - (sizeof(int) + GUID_SIZE)));
+                int headerSize = sizeof(int) + GUID_SIZE;
+                int messageSize = packetSize - headerSize;
 
-                if (read < messageSize)
+                if (messageSize > 0)
+                {
+                    context.ResponseMessage.Write(memoryOwner.Memory.Span.Slice(headerSize, messageSize));
+                }
+
+                if (read < packetSize)
                 {
                     while ((read = await socket.ReceiveAsync(memoryOwner.Memory, SocketFlags.None, Token)) > 0)
                     {
@@ -65,8 +73,7 @@ namespace RPC.Library.Listeners
                 }
 
                 EndReceive(context);
-
-            }, Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            }
         }
 
         public override async Task<bool> AcceptConnection(ushort port)

@@ -57,36 +57,47 @@ namespace RPC.Library.Listeners
         {
             return Task.Factory.StartNew(() =>
             {
-                byte[] buffer = new byte[bufferSize];
-                int read = socket.Receive(buffer, SocketFlags.None);
-                int messageSize = BitConverter.ToInt32(buffer);
-
-                var key = new Guid(new ReadOnlySpan<byte>(buffer, sizeof(int), GUID_SIZE));
-
-                BaseWaitContext context;
-
-                if (!ResponseMessagesDictionary.ContainsKey(key))
+                while (!Token.IsCancellationRequested)
                 {
-                    context = ResponseMessagesDictionary.AddOrUpdate(key, WaitContext.WaitForResponse, (key, value) => value);
-                    context.FireEvent = true;
-                }
-                else
-                {
-                    context = ResponseMessagesDictionary[key];
-                }
+                    byte[] buffer = new byte[bufferSize];
+                    int read = socket.Receive(buffer, SocketFlags.None);
+                    int packetSize = BitConverter.ToInt32(buffer);
 
-                context.ResponseMessage.Write(new ReadOnlySpan<byte>(buffer, sizeof(int) + GUID_SIZE, read - (sizeof(int) + GUID_SIZE)));
+                    var key = new Guid(new Span<byte>(buffer, sizeof(int), GUID_SIZE));
 
-                if (read < messageSize)
-                {
-                    while ((read = socket.Receive(buffer, 0, buffer.Length, SocketFlags.None)) > 0)
+                    BaseWaitContext context;
+
+                    if (this.ResponseMessagesDictionary.ContainsKey(key))
                     {
-                        ResponseMessagesDictionary[key].ResponseMessage.Write(buffer, 0, read);
+                        context = this.ResponseMessagesDictionary[key];
+                        context.ShouldWait = true;
+                        context.FireEvent = true;
                     }
+                    else
+                    {
+                        context = this.ResponseMessagesDictionary.GetOrAdd(key, (k, shouldWait) => new WaitContext(k, shouldWait), true);
+                        context.FireEvent = true;
+                        context.ShouldWait = false;
+                    }
+
+                    int headerSize = sizeof(int) + GUID_SIZE;
+                    int messageSize = packetSize - headerSize;
+
+                    if (messageSize > 0)
+                    {
+                        context.ResponseMessage.Write(buffer, headerSize, messageSize);
+                    }
+
+                    if (read < packetSize)
+                    {
+                        while ((read = socket.Receive(buffer, SocketFlags.None)) > 0)
+                        {
+                            ResponseMessagesDictionary[key].ResponseMessage.Write(buffer, 0, read);
+                        }
+                    }
+
+                    EndReceive(context);
                 }
-
-                EndReceive(context);
-
             }, Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
     }

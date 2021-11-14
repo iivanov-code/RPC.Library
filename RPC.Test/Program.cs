@@ -14,6 +14,7 @@ namespace RPC.Test
             if (isHost)
             {
                 var host = MainServiceHost<IService, Service>.InitMainNode(899, true);
+                Console.WriteLine($"Listening on: {host.LocalEndpoint}");
             }
             else
             {
@@ -21,6 +22,8 @@ namespace RPC.Test
 
                 bool result = networkClient.Connect().GetAwaiter().GetResult();
                 networkClient.Listen();
+
+                Console.WriteLine($"Connected to: {networkClient.RemoteHostIP}:{networkClient.RemotePort}");
 
                 Stopwatch stopwatch = new Stopwatch();
                 List<long> times = new List<long>();
@@ -37,7 +40,6 @@ namespace RPC.Test
                 Console.WriteLine("Max: " + times.Max());
             }
 
-            Console.WriteLine("Hello World!");
             Console.ReadLine();
         }
     }
