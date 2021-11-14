@@ -33,6 +33,15 @@ namespace NetworkCommunicator.Network
             RemoteService = DynamicProxy.Create<TRemoteService>(new OperationProxyHandler(this), responseMessages);
         }
 
+        public ServiceNetworkClient(TCallbackService service, int bufferSize = 4096)
+            : base(null, bufferSize)
+        {
+            this.Service = service;
+            this.responseMessages = new ConcurrentDictionary<Guid, BaseMessage>();
+            MessageReceived += ServiceNetworkClient_MessageReceived;
+            RemoteService = DynamicProxy.Create<TRemoteService>(new OperationProxyHandler(this), responseMessages);
+        }
+
         private void ServiceNetworkClient_MessageReceived(object sender, MessageEventArgs e)
         {
             BaseMessage message = MessagePipeline.Unwrap(e.MessageBuffer);

@@ -74,6 +74,7 @@ namespace RPC.Library.Listeners
         public abstract Task<bool> Connect(IPAddress remoteHostIp, ushort remotePort);
         public abstract Task<int> Send(byte[] messageBuffer, BaseWaitContext context);
         public abstract Task<bool> AcceptConnection(ushort port);
+        public abstract Task<bool> Disconnect();
 
         protected void EndReceive(BaseWaitContext context)
         {
@@ -124,6 +125,7 @@ namespace RPC.Library.Listeners
             try
             {
                 socket.Bind(new IPEndPoint(IPAddress.Any, port));
+                socket.Listen(port);
                 return true;
             }
             catch (Exception)

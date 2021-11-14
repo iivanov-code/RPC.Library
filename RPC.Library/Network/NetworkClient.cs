@@ -17,28 +17,31 @@ namespace NetworkCommunicator.Network
         private IPAddress remoteHostIp;
         private ushort remotePort;
 
-        public NetworkClient(string remoteHostIP, ushort remotePort, int bufferSize = 4096)
-            : this(new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp), bufferSize)
+        protected NetworkClient(string remoteHostIP, ushort remotePort, int bufferSize = 4096)
+            : this(null, bufferSize)
         {
             this.RemoteHostIP = IPAddress.Parse(remoteHostIP);
             this.RemotePort = remotePort;
 
         }
 
-        public NetworkClient(Socket socket, int bufferSize = 4096, ListenerTypes type = ListenerTypes.Event)
+        protected NetworkClient(Socket socket, int bufferSize = 4096, ListenerTypes type = ListenerTypes.Event)
         {
-            this.socket = socket;
+            if (socket == null)
+            {
+                this.socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            }
 
             switch (type)
             {
                 case ListenerTypes.Basic:
-                    this.listener = new Listener(ref socket, bufferSize);
+                    this.listener = new Listener(ref this.socket, bufferSize);
                     break;
                 case ListenerTypes.Async:
-                    this.listener = new AsyncListener(ref socket, bufferSize);
+                    this.listener = new AsyncListener(ref this.socket, bufferSize);
                     break;
                 case ListenerTypes.Event:
-                    this.listener = new EventListener(ref socket, bufferSize);
+                    this.listener = new EventListener(ref this.socket, bufferSize);
                     break;
             }
         }
@@ -52,6 +55,14 @@ namespace NetworkCommunicator.Network
             remove
             {
                 listener.MessageReceived -= value;
+            }
+        }
+
+        public IPEndPoint LocalEndpoint
+        {
+            get
+            {
+                return socket.LocalEndPoint as IPEndPoint;
             }
         }
 
@@ -115,6 +126,11 @@ namespace NetworkCommunicator.Network
         public Task<int> Send(byte[] messageBuffer, BaseWaitContext context)
         {
             return listener.Send(messageBuffer, context);
+        }
+
+        public Task<bool> Disconnect()
+        {
+            return listener.Disconnect();
         }
 
         protected virtual void Dispose(bool disposing)

@@ -123,6 +123,7 @@ namespace RPC.Library.Listeners
             {
                 IAsyncResult result = socket.BeginAccept(new AsyncCallback(AcceptedCallback), null);
                 bool wait = result.IsCompleted || result.AsyncWaitHandle.WaitOne();
+
                 return Task.FromResult(wait);
             }
 
@@ -131,7 +132,34 @@ namespace RPC.Library.Listeners
 
         private void AcceptedCallback(IAsyncResult result)
         {
-            socket = socket.EndAccept(result);
+            var tempSocket = socket.EndAccept(result);
+            Interlocked.Exchange(ref socket, tempSocket);
+            result.AsyncWaitHandle.Close();
+        }
+
+        public override Task<bool> Disconnect()
+        {
+            var result = socket.BeginDisconnect(true, new AsyncCallback(DisconnectedCallback), null);
+
+            if (result.IsCompleted || result.AsyncWaitHandle.WaitOne())
+            {
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+        }
+
+        private void DisconnectedCallback(IAsyncResult result)
+        {
+            try
+            {
+                socket.EndDisconnect(result);
+            }
+            catch (Exception)
+            { }
+
             result.AsyncWaitHandle.Close();
         }
     }

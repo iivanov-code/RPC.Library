@@ -5,7 +5,7 @@ using NetworkCommunicator.Utils;
 
 namespace NetworkCommunicator.Host
 {
-    public sealed class MainServiceHost<TServiceContract, TServiceImplementation> : ServiceHostSingleton<INetworkClient, MainServiceHost<TServiceContract, TServiceImplementation>>
+    public sealed class MainServiceHost<TServiceImplementation, TServiceContract> : ServiceHostSingleton<INetworkClient, MainServiceHost<TServiceImplementation, TServiceContract>>
        where TServiceContract : class
        where TServiceImplementation : class, TServiceContract, new()
     {

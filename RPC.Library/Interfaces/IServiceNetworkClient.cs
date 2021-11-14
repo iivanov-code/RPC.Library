@@ -1,6 +1,6 @@
 ﻿namespace NetworkCommunicator.Interfaces
 {
-    public interface IServiceNetworkClient<TCallbackService, TRemoteService>
+    public interface IServiceNetworkClient<TCallbackService, TRemoteService> : INetworkClient
         where TCallbackService : class
         where TRemoteService : class
     {

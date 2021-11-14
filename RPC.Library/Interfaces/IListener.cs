@@ -19,5 +19,6 @@ namespace RPC.Library.Listeners
         Task<bool> Connect(IPAddress remoteHostIp, ushort remotePort);
         Task Listen();
         Task<int> Send(byte[] messageBuffer, BaseWaitContext context);
+        Task<bool> Disconnect();
     }
 }

@@ -109,5 +109,18 @@ namespace RPC.Library.Listeners
                 }
             }, Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
         }
+
+        public override Task<bool> Disconnect()
+        {
+            try
+            {
+                socket.Disconnect(true);
+                return Task.FromResult(true);
+            }
+            catch (Exception)
+            {
+                return Task.FromResult(false);
+            }
+        }
     }
 }

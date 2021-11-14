@@ -85,5 +85,11 @@ namespace RPC.Library.Listeners
 
             return false;
         }
+
+        public override async Task<bool> Disconnect()
+        {
+            await socket.DisconnectAsync(true, Token);
+            return true;
+        }
     }
 }
