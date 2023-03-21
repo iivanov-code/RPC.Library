@@ -15,6 +15,7 @@ namespace NetworkCommunicator.Network
         where TRemoteService : class
     {
         private ConcurrentDictionary<Guid, BaseMessage> responseMessages;
+
         internal ServiceNetworkClient(Socket socket, TCallbackService service, int bufferSize = 4096)
             : base(socket, bufferSize)
         {
@@ -60,7 +61,6 @@ namespace NetworkCommunicator.Network
         public TRemoteService RemoteService { get; private set; }
 
         public TCallbackService Service { get; private set; }
-
 
         private void ExecuteEndpointMethod(Guid key, BaseMessage message)
         {

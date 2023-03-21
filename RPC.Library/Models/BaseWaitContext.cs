@@ -35,9 +35,9 @@ namespace NetworkCommunicator.Models
         }
 
         public bool FireEvent { get; set; }
-        public Guid Guid { get; init; }
+        public Guid Guid { get; set; }
         public bool ShouldWait { get; set; }
-        public MemoryStream ResponseMessage { get; init; }
-        public ManualResetEvent WaitHandle { get; init; }
+        public MemoryStream ResponseMessage { get; set; }
+        public ManualResetEvent WaitHandle { get; set; }
     }
 }

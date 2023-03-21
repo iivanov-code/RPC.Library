@@ -33,6 +33,5 @@ namespace NetworkCommunicator.Models
                 Data = NetworkUtils.Serialize(model);
             }
         }
-
     }
 }

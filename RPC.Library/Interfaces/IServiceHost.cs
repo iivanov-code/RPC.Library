@@ -11,6 +11,7 @@ namespace NetworkCommunicator.Interfaces
         IReadOnlyList<INetworkClient> NetworkClients { get; }
 
         Task StartListeningForClients(ushort port);
+
         void StopListening();
     }
 }

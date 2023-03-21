@@ -13,7 +13,7 @@ namespace RPC.Test
 
             if (isHost)
             {
-                ServerListener();
+                ServerHost();
             }
             else
             {
@@ -41,7 +41,7 @@ namespace RPC.Test
         {
             Data data;
             IServiceNetworkClient<Service, IService> networkClient = new ServiceNetworkClient<Service, IService>("127.0.0.1", 899, new Service());
-          
+
             bool result = networkClient.Connect().GetAwaiter().GetResult();
             networkClient.Listen();
 

@@ -1,4 +1,5 @@
-﻿using System.Net.Sockets;
+﻿using System;
+using System.Net.Sockets;
 using NetworkCommunicator.Interfaces;
 using NetworkCommunicator.Network;
 using NetworkCommunicator.Utils;
@@ -7,8 +8,10 @@ namespace NetworkCommunicator.Host
 {
     public sealed class MainServiceHost<TServiceImplementation, TServiceContract> : ServiceHostSingleton<INetworkClient, MainServiceHost<TServiceImplementation, TServiceContract>>
        where TServiceContract : class
-       where TServiceImplementation : class, TServiceContract, new()
+       where TServiceImplementation : class
     {
+        private readonly TServiceImplementation singletonServiceImplementation;
+
         public static IServiceHost InitMainNode(ushort port, bool clientStartListening = false)
         {
             while (!NetworkUtils.IsPortAvailable(port))
@@ -23,13 +26,30 @@ namespace NetworkCommunicator.Host
 
         protected override INetworkClient OnNewClientAdded(Socket socket)
         {
-            var client = new ServiceNetworkClient<TServiceImplementation, TServiceContract>(socket, new TServiceImplementation());
+            ServiceNetworkClient<TServiceImplementation, TServiceContract> client;
+
+            if (singletonServiceImplementation == null)
+            {
+                client = new ServiceNetworkClient<TServiceImplementation, TServiceContract>(socket, Activator.CreateInstance<TServiceImplementation>());
+            }
+            else
+            {
+                client = new ServiceNetworkClient<TServiceImplementation, TServiceContract>(socket, singletonServiceImplementation);
+            }
+
             this.clients.Add(client);
             return client;
         }
 
-        private MainServiceHost(bool clientStartListening = false)
+        public MainServiceHost(TServiceImplementation serviceInstance, bool clientStartListening = false)
             : base(clientStartListening)
-        { }
+        {
+            this.singletonServiceImplementation = serviceInstance;
+        }
+
+        public MainServiceHost(bool clientStartListening = false)
+            : base(clientStartListening)
+        {
+        }
     }
 }

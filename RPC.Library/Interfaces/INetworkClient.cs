@@ -11,7 +11,9 @@ namespace NetworkCommunicator.Interfaces
         ushort RemotePort { get; }
 
         Task<bool> AcceptConnection(ushort port);
+
         Task<bool> Connect();
+
         Task Listen();
     }
 }

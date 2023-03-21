@@ -22,7 +22,6 @@ namespace NetworkCommunicator.Network
         {
             this.RemoteHostIP = IPAddress.Parse(remoteHostIP);
             this.RemotePort = remotePort;
-
         }
 
         protected NetworkClient(Socket socket, int bufferSize = 4096, ListenerTypes type = ListenerTypes.Event)
@@ -37,9 +36,11 @@ namespace NetworkCommunicator.Network
                 case ListenerTypes.Basic:
                     this.listener = new Listener(ref this.socket, bufferSize);
                     break;
+
                 case ListenerTypes.Async:
                     this.listener = new AsyncListener(ref this.socket, bufferSize);
                     break;
+
                 case ListenerTypes.Event:
                     this.listener = new EventListener(ref this.socket, bufferSize);
                     break;
@@ -105,13 +106,11 @@ namespace NetworkCommunicator.Network
             return listener.Connect(RemoteHostIP, RemotePort);
         }
 
-
         public void Dispose()
         {
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-
 
         public Task Listen()
         {

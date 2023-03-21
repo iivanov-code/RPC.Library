@@ -18,6 +18,7 @@ namespace NetworkCommunicator.Utils
         }
 
         private int maxBufferSize;
+
         public override int MaxBufferSize
         {
             get
@@ -90,6 +91,7 @@ namespace NetworkCommunicator.Utils
         public Memory<T> Memory { get; private set; }
 
         private event EventHandler<MemoryEventArgs> onMemoryFreed;
+
         public event EventHandler<MemoryEventArgs> OnMemoryFreed
         {
             add

@@ -8,7 +8,8 @@ using NetworkCommunicator.Interfaces;
 
 namespace NetworkCommunicator.Host
 {
-    public abstract class BaseServiceHost<TClient> : IDisposable, IServiceHost where TClient : INetworkClient
+    public abstract class BaseServiceHost<TClient> : IDisposable, IServiceHost
+        where TClient : INetworkClient
     {
         protected readonly List<INetworkClient> clients;
 
@@ -23,9 +24,9 @@ namespace NetworkCommunicator.Host
         protected BaseServiceHost(bool clientStartListening = false)
         {
             this.clientStartListening = clientStartListening;
-            clients = new List<INetworkClient>();
+            this.clients = new List<INetworkClient>();
             this.tokenSource = new CancellationTokenSource();
-            Listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+            this.Listener = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         }
 
         public IPEndPoint LocalEndpoint

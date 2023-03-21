@@ -73,7 +73,7 @@ namespace RPC.Library.Listeners
 
         private void Receive(IAsyncResult result)
         {
-            if (result.AsyncState is not BaseWaitContext)
+            if (!(result.AsyncState is BaseWaitContext))
             {
                 byte[] buffer = result.AsyncState as byte[];
 

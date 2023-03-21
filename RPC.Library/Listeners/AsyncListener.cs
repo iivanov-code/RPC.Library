@@ -23,8 +23,7 @@ namespace RPC.Library.Listeners
 
         public override Task<bool> Connect(IPAddress remoteHostIp, ushort remotePort)
         {
-            return socket.ConnectAsync(remoteHostIp, remotePort, Token)
-                .AsTask()
+            return socket.ConnectAsync(remoteHostIp, remotePort)
                 .ContinueWith(t =>
                 {
                     return !t.IsFaulted;
@@ -80,16 +79,19 @@ namespace RPC.Library.Listeners
         {
             if (Bind(port))
             {
-                socket = await socket.AcceptAsync(Token);
+                socket = await socket.AcceptAsync();
             }
 
             return false;
         }
 
-        public override async Task<bool> Disconnect()
+        public override Task<bool> Disconnect()
         {
-            await socket.DisconnectAsync(true, Token);
-            return true;
+            bool result = socket.DisconnectAsync(new SocketAsyncEventArgs
+            {
+            });
+
+            return Task.FromResult(result);
         }
     }
 }

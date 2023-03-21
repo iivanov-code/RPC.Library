@@ -16,9 +16,13 @@ namespace RPC.Library.Listeners
         event EventHandler<MessageEventArgs> MessageReceived;
 
         Task<bool> AcceptConnection(ushort port);
+
         Task<bool> Connect(IPAddress remoteHostIp, ushort remotePort);
+
         Task Listen();
+
         Task<int> Send(byte[] messageBuffer, BaseWaitContext context);
+
         Task<bool> Disconnect();
     }
 }

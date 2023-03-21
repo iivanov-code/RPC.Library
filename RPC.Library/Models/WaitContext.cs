@@ -27,6 +27,5 @@ namespace NetworkCommunicator.Models
                 return new WaitContext(false);
             }
         }
-
     }
 }

@@ -22,7 +22,6 @@ namespace NetworkCommunicator.Utils
         private OperationProxyHandler handler;
         private ConcurrentDictionary<Guid, BaseMessage> responseMessages;
 
-
         public static TProxy Create(OperationProxyHandler handler, ConcurrentDictionary<Guid, BaseMessage> responseMessages)
         {
             TProxy proxy = Create<TProxy, DynamicProxy<TProxy>>();

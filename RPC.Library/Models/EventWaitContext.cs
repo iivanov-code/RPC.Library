@@ -30,7 +30,6 @@ namespace NetworkCommunicator.Models
         public int MessageSize { get; set; }
         public int Read { get; set; }
 
-
         public static EventWaitContext WaitForResponse
         {
             get

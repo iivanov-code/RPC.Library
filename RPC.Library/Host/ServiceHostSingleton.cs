@@ -9,7 +9,7 @@ namespace NetworkCommunicator.Host
            where TClient : INetworkClient
            where THost : IServiceHost
     {
-        private readonly static Dictionary<HostKey, THost> instances = new Dictionary<HostKey, THost>();
+        private static readonly Dictionary<HostKey, THost> instances = new Dictionary<HostKey, THost>();
 
         internal static THost Instance(ushort port, bool clientStartListening = false)
         {

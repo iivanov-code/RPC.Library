@@ -13,6 +13,7 @@ namespace NetworkCommunicator.Utils
     {
         private static object hashLock = new object();
         private static HashAlgorithm hashAlgorithm;
+
         public static HashAlgorithm HashAlgorithm
         {
             get
@@ -34,6 +35,7 @@ namespace NetworkCommunicator.Utils
 
         private static object keyedHashLock = new object();
         private static KeyedHashAlgorithm keyedHashAlgorithm;
+
         public static KeyedHashAlgorithm KeyedHashAlgorithm(string key)
         {
             if (keyedHashAlgorithm == null)
@@ -163,8 +165,10 @@ namespace NetworkCommunicator.Utils
                 case ProtocolType.Tcp:
                     return !ipGlobalProperties.GetActiveTcpConnections().Any(x => x.LocalEndPoint.Port == port)
                         && !ipGlobalProperties.GetActiveTcpListeners().Any(x => x.Port == port);
+
                 case ProtocolType.Udp:
                     return !ipGlobalProperties.GetActiveUdpListeners().Any(x => x.Port == port);
+
                 default:
                     return true;
             }
