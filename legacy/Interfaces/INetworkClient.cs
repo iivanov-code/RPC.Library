@@ -6,6 +6,7 @@ namespace NetworkCommunicator.Interfaces
 {
     public interface INetworkClient : INetworkSender, IDisposable
     {
+        int Id { get => LocalEndpoint.Port; }
         IPEndPoint LocalEndpoint { get; }
         IPAddress RemoteHostIP { get; }
         ushort RemotePort { get; }
